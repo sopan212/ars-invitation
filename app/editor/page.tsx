@@ -18,11 +18,12 @@ export default function EditorPage() {
         location 
       };
       
-      await pb.collection('events').create(data);
-      alert('Data berhasil disimpan ke database, BOSS!');
-    } catch (error) {
-      console.error(error);
-      alert('Gagal simpan data, cek koneksi backend!');
+      const record = await pb.collection('events').create(data);
+      console.log('Saved:', record);
+      alert('Data berhasil disimpan ke database, BOSS! ID: ' + record.id);
+    } catch (error: any) {
+      console.error('Save error details:', error);
+      alert('Gagal simpan: ' + (error?.message || JSON.stringify(error)));
     }
   };
 
