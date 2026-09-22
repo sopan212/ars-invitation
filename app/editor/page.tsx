@@ -31,11 +31,29 @@ export default function EditorPage() {
 
   const [selectedTemplate, setSelectedTemplate] = useState('classic-elegant');
 
+  // Photo state — ponytail: preview via object URL, replaced by PB url after save
+  const [photoBg, setPhotoBg] = useState<File | null>(null);
+  const [gallery, setGallery] = useState<File[]>([]);
+  const [photoBgPreview, setPhotoBgPreview] = useState<string>('');
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+
   const template = getTemplate(selectedTemplate);
+
+  const handlePhotoBg = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    setPhotoBg(f);
+    setPhotoBgPreview(f ? URL.createObjectURL(f) : '');
+  };
+
+  const handleGallery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setGallery(files);
+    setGalleryPreviews(files.map((f) => URL.createObjectURL(f)));
+  };
 
   const handleSave = async () => {
     try {
-      const data = { 
+      const data: Record<string, any> = { 
         title, 
         groom_name: groomName,
         groom_parents: groomParents,
@@ -53,6 +71,9 @@ export default function EditorPage() {
         bank_holder: bankHolder,
         template_id: selectedTemplate,
       };
+
+      if (photoBg) data.photo_bg = photoBg;
+      if (gallery.length > 0) data.gallery = gallery;
       
       const record = await pb.collection('events').create(data);
       const publicUrl = `http://100.74.92.59:3000/undangan/${record.id}`;
@@ -166,6 +187,49 @@ export default function EditorPage() {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Background photo */}
+                <div className="space-y-3 pt-2 border-t border-white/10">
+                  <label className="block text-sm font-medium text-gray-300">
+                    🌅 Foto Background (Hero / Cover)
+                  </label>
+                  <p className="text-xs text-gray-500">JPG / PNG / WEBP, maks 5MB. Ditampilkan sebagai latar belakang halaman utama undangan.</p>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handlePhotoBg}
+                    className="block w-full text-sm text-gray-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#FFD700] file:text-[#1a1a4e] hover:file:bg-[#ffdd33] cursor-pointer"
+                  />
+                  {photoBgPreview && (
+                    <div className="relative rounded-xl overflow-hidden border border-white/10 max-h-64">
+                      <img src={photoBgPreview} alt="Preview background" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Gallery photos */}
+                <div className="space-y-3 pt-2 border-t border-white/10">
+                  <label className="block text-sm font-medium text-gray-300">
+                    📚 Galeri Foto (maks 10 foto)
+                  </label>
+                  <p className="text-xs text-gray-500">JPG / PNG / WEBP, maks 5MB per foto. Ditampilkan sebagai galeri prewedding di undangan.</p>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    onChange={handleGallery}
+                    className="block w-full text-sm text-gray-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#FFD700] file:text-[#1a1a4e] hover:file:bg-[#ffdd33] cursor-pointer"
+                  />
+                  {galleryPreviews.length > 0 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                      {galleryPreviews.map((src, i) => (
+                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
+                          <img src={src} alt={`Galeri ${i + 1}`} className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -312,13 +376,20 @@ export default function EditorPage() {
               {/* Phone Frame */}
               <div className="relative mx-auto rounded-[36px] border-[8px] border-[#2d2d44] shadow-2xl overflow-hidden bg-black aspect-[9/18] max-h-[640px] flex flex-col">
                 <div 
-                  className="flex-1 overflow-y-auto p-6 text-center space-y-6 flex flex-col justify-between"
+                  className="flex-1 overflow-y-auto p-6 text-center space-y-6 flex flex-col justify-between relative"
                   style={{ 
                     backgroundColor: template?.colors.background || '#ffffff',
                     color: template?.colors.text || '#1a1a1a',
                   }}
                 >
-                  <div className="pt-6 space-y-3">
+                  {photoBgPreview && (
+                    <>
+                      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${photoBgPreview})` }} />
+                      <div className="absolute inset-0" style={{ backgroundColor: (template?.colors.background || '#000000') + 'CC' }} />
+                    </>
+                  )}
+
+                  <div className="relative pt-6 space-y-3">
                     <p className="text-[10px] tracking-widest uppercase opacity-70">The Wedding Of</p>
                     <h3 
                       className="text-2xl font-bold leading-tight"
@@ -332,12 +403,12 @@ export default function EditorPage() {
                     </p>
                   </div>
 
-                  <div className="p-3 rounded-xl border text-xs space-y-1" style={{ borderColor: template?.colors.accent + '40', backgroundColor: template?.colors.secondary + '10' }}>
+                  <div className="p-3 rounded-xl border text-xs space-y-1 relative" style={{ borderColor: template?.colors.accent + '40', backgroundColor: template?.colors.secondary + '10' }}>
                     <p className="font-bold">{location}</p>
                     <p className="text-[10px] opacity-70 line-clamp-2">{addressDetail}</p>
                   </div>
 
-                  <div className="pb-4 space-y-2">
+                  <div className="pb-4 space-y-2 relative">
                     <div className="w-full py-2.5 rounded-full text-xs font-bold shadow" style={{ backgroundColor: template?.colors.accent, color: template?.colors.background }}>
                       ✉️ Buka Undangan
                     </div>

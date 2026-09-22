@@ -4,10 +4,12 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 
 const pb = new PocketBase('http://100.74.92.59:8090');
+pb.autoCancellation(false);
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
-    const event = await pb.collection('events').getOne(params.id);
+    const { id } = await params;
+    const event = await pb.collection('events').getOne(id);
     return {
       title: `${event.title} - Undangan Digital`,
       description: `Undangan pernikahan ${event.groom_name} & ${event.bride_name}`,
@@ -17,9 +19,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function UndanganPage({ params }: { params: { id: string } }) {
+export default async function UndanganPage({ params }: { params: Promise<{ id: string }> }) {
   try {
-    const event = await pb.collection('events').getOne(params.id);
+    const { id } = await params;
+    const event = await pb.collection('events').getOne(id);
     const template = getTemplate(event.template_id || 'classic-elegant');
     
     if (!template) return notFound();
@@ -32,6 +35,12 @@ export default async function UndanganPage({ params }: { params: { id: string } 
       day: 'numeric'
     }) : '';
 
+    const pbUrl = 'http://100.74.92.59:8090';
+    const photoBg = event.photo_bg ? `${pbUrl}/api/files/${event.collectionId}/${event.id}/${event.photo_bg}` : '';
+    const gallery: string[] = Array.isArray(event.gallery)
+      ? event.gallery.map((f: string) => `${pbUrl}/api/files/${event.collectionId}/${event.id}/${f}`)
+      : [];
+
     return (
       <div 
         className="min-h-screen flex flex-col"
@@ -43,11 +52,18 @@ export default async function UndanganPage({ params }: { params: { id: string } 
       >
         {/* Hero / Cover Section */}
         <section className="relative min-h-screen flex flex-col items-center justify-center px-6 py-20 text-center">
-          {/* Decorative background */}
-          <div className="absolute inset-0 opacity-10" style={{ 
-            backgroundImage: `radial-gradient(circle at 50% 50%, ${template.colors.accent} 1px, transparent 1px)`,
-            backgroundSize: '30px 30px'
-          }} />
+          {/* Background photo */}
+          {photoBg ? (
+            <>
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${photoBg})` }} />
+              <div className="absolute inset-0" style={{ backgroundColor: template.colors.background + 'CC' }} />
+            </>
+          ) : (
+            <div className="absolute inset-0 opacity-10" style={{ 
+              backgroundImage: `radial-gradient(circle at 50% 50%, ${template.colors.accent} 1px, transparent 1px)`,
+              backgroundSize: '30px 30px'
+            }} />
+          )}
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-8">
             <p className="text-sm tracking-[0.3em] uppercase opacity-70">The Wedding Of</p>
@@ -109,6 +125,33 @@ export default async function UndanganPage({ params }: { params: { id: string } 
             </div>
           </div>
         </section>
+
+        {/* Photo Gallery */}
+        {gallery.length > 0 && (
+          <section className="py-20 px-6">
+            <div className="max-w-3xl mx-auto">
+              <h3 className="text-2xl font-bold text-center tracking-widest uppercase mb-10" style={{ color: template.colors.accent }}>
+                Galeri Kami
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                {gallery.map((src, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-square rounded-2xl overflow-hidden border shadow-sm transition hover:scale-105"
+                    style={{ borderColor: template.colors.accent + '30' }}
+                  >
+                    <img
+                      src={src}
+                      alt={`Galeri ${i + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Event Details */}
         <section className="py-20 px-6" style={{ backgroundColor: template.colors.secondary + '15' }}>
