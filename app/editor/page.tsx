@@ -44,22 +44,73 @@ export default function EditorPage() {
   const [gallery, setGallery] = useState<File[]>([]);
   const [photoBgPreview, setPhotoBgPreview] = useState<string>('');
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [compressing, setCompressing] = useState(false);
 
   const template = getTemplate(selectedTemplate);
 
-  const handlePhotoBg = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] || null;
-    setPhotoBg(f);
-    setPhotoBgPreview(f ? URL.createObjectURL(f) : '');
-  };
-
-  const handleGallery = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setGallery(files);
-    setGalleryPreviews(files.map((f) => URL.createObjectURL(f)));
-  };
-
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB — batas PocketBase
+
+  // Compress foto di browser: resize ke max 1920px, re-encode JPEG 80%
+  // Ponytail: kalau perlu kualitas lebih tinggi nanti, naikkan ke 0.9 / 2560px
+  async function compressPhoto(file: File): Promise<File> {
+    const MAX_DIM = 1920;
+    const QUALITY = 0.8;
+
+    if (!file.type.startsWith('image/')) return file;
+
+    const img = await new Promise<HTMLImageElement | null>((resolve) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => resolve(null);
+      el.src = URL.createObjectURL(file);
+    });
+    if (!img) return file;
+
+    let { width, height } = img;
+    if (width > MAX_DIM || height > MAX_DIM) {
+      const scale = MAX_DIM / Math.max(width, height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return file;
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', QUALITY)
+    );
+    URL.revokeObjectURL(img.src);
+    if (!blob) return file;
+
+    return new File([blob], file.name.replace(/\.(png|webp)$/i, '.jpg'), {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+    });
+  }
+
+  const handlePhotoBg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.files?.[0] || null;
+    if (!raw) { setPhotoBg(null); setPhotoBgPreview(''); return; }
+    setCompressing(true);
+    const f = await compressPhoto(raw);
+    setCompressing(false);
+    setPhotoBg(f);
+    setPhotoBgPreview(URL.createObjectURL(f));
+  };
+
+  const handleGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setCompressing(true);
+    const compressed = await Promise.all(files.map(compressPhoto));
+    setCompressing(false);
+    setGallery(compressed);
+    setGalleryPreviews(compressed.map((f) => URL.createObjectURL(f)));
+  };
 
   const removePhotoBg = () => {
     if (photoBgPreview) URL.revokeObjectURL(photoBgPreview);
@@ -349,7 +400,10 @@ export default function EditorPage() {
                   <label className="block text-sm font-medium text-[#6B6157]">
                     🌅 Foto Background (Hero / Cover)
                   </label>
-                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP, maks 5MB. Ditampilkan sebagai latar belakang halaman utama undangan.</p>
+                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP. Foto otomatis dikompres (maks 1920px, ≤5MB) — aman untuk foto HP berukuran besar.</p>
+                  {compressing && (
+                    <p className="text-xs text-[#7C8B6F] font-medium animate-pulse">⏳ Mengompres foto...</p>
+                  )}
                   <input
                     type="file"
                     data-field="photo_bg"
@@ -377,7 +431,7 @@ export default function EditorPage() {
                   <label className="block text-sm font-medium text-[#6B6157]">
                     📚 Galeri Foto (maks 10 foto)
                   </label>
-                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP, maks 5MB per foto. Ditampilkan sebagai galeri prewedding di undangan.</p>
+                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP. Setiap foto otomatis dikompres (maks 1920px, ≤5MB).</p>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
