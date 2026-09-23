@@ -37,10 +37,10 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-[#FAF7F2]/85 border-b border-[#E5DED2]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-serif font-semibold tracking-tight">
+          <Link href="/" className="text-xl font-serif font-semibold tracking-tight">
             <span className="text-[#7C8B6F]">ARS</span>
             <span className="text-[#2A2622]">.invitation</span>
-          </h1>
+          </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#6B6157]">
             <a href="#features" className="hover:text-[#2A2622] transition">Fitur</a>
             <a href="#templates" className="hover:text-[#2A2622] transition">Template</a>
@@ -250,9 +250,9 @@ export default function Home() {
       <footer className="py-12 px-6 border-t border-[#E5DED2]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h1 className="font-serif text-lg font-semibold">
+            <Link href="/" className="font-serif text-lg font-semibold transition hover:opacity-80">
               <span className="text-[#7C8B6F]">ARS</span>.invitation
-            </h1>
+            </Link>
             <p className="text-[#9C9286] text-sm mt-1">© 2026 ARS.invitation. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-6 text-sm text-[#6B6157]">

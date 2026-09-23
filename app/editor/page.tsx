@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import PocketBase from 'pocketbase';
 import { TemplateSelector } from '@/components/TemplateSelector';
 import { getTemplate } from '@/lib/templates';
@@ -89,9 +90,9 @@ export default function EditorPage() {
       {/* Header */}
       <div className="border-b border-[#E5DED2] px-6 py-4 sticky top-0 bg-[#FAF7F2]/90 backdrop-blur z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="font-serif text-2xl font-semibold">
+          <Link href="/" className="font-serif text-2xl font-semibold transition hover:opacity-80">
             <span className="text-[#7C8B6F]">ARS</span>.editor
-          </h1>
+          </Link>
           <button 
             onClick={handleSave} 
             className="bg-[#C08552] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95 shadow-sm shadow-[#C08552]/30"
