@@ -7,9 +7,16 @@ import { TemplateSelector } from '@/components/TemplateSelector';
 import { getTemplate } from '@/lib/templates';
 
 const pb = new PocketBase('http://100.74.92.59:8090');
+pb.autoCancellation(false);
 
 export default function EditorPage() {
   const [activeTab, setActiveTab] = useState<'couple' | 'event' | 'gift' | 'template'>('couple');
+
+  // Hasil save — link undangan user
+  const [savedUrl, setSavedUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [copied, setCopied] = useState(false);
   
   // Form State
   const [title, setTitle] = useState('Pernikahan Romeo & Juliet');
@@ -53,6 +60,8 @@ export default function EditorPage() {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError('');
     try {
       const data: Record<string, any> = { 
         title, 
@@ -77,12 +86,36 @@ export default function EditorPage() {
       if (gallery.length > 0) data.gallery = gallery;
       
       const record = await pb.collection('events').create(data);
-      const publicUrl = `http://100.74.92.59:3000/undangan/${record.id}`;
-      alert(`Berhasil disimpan ke Database! 🚀\n\nID Undangan: ${record.id}\nLink Undangan: ${publicUrl}`);
+      setSavedUrl(`http://100.74.92.59:3000/undangan/${record.id}`);
+      setCopied(false);
     } catch (error: any) {
-      console.error('Save error details:', error);
-      alert('Gagal simpan: ' + (error?.message || JSON.stringify(error)));
+      setSaveError(error?.message || 'Gagal menyimpan. Coba lagi.');
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(savedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback untuk browser tanpa clipboard API
+      const input = document.createElement('input');
+      input.value = savedUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleShareWa = () => {
+    const text = `Halo! Kamu diundang ke pernikahan ${groomName} & ${brideName} 💍\n\nLihat undangannya di sini:\n${savedUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -95,12 +128,83 @@ export default function EditorPage() {
           </Link>
           <button 
             onClick={handleSave} 
-            className="bg-[#C08552] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95 shadow-sm shadow-[#C08552]/30"
+            disabled={isSaving}
+            className="bg-[#C08552] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95 shadow-sm shadow-[#C08552]/30 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            💾 Simpan & Terbitkan Undangan
+            {isSaving ? 'Menyimpan...' : '💾 Simpan & Terbitkan Undangan'}
           </button>
         </div>
       </div>
+
+      {/* Panel hasil save — link undangan user */}
+      {savedUrl && (
+        <div className="sticky top-[65px] z-40 px-6">
+          <div className="max-w-7xl mx-auto mt-4 bg-[#FFFDF9] border border-[#7C8B6F]/40 rounded-2xl p-5 shadow-lg shadow-[#7C8B6F]/10 space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0">🎉</span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-serif text-lg font-bold text-[#2A2622]">Undangan berhasil diterbitkan!</h3>
+                <p className="text-sm text-[#6B6157]">Simpan link ini — bagikan ke tamu undangan kamu.</p>
+              </div>
+              <button
+                onClick={() => setSavedUrl('')}
+                className="text-[#9C9286] hover:text-[#2A2622] text-xl leading-none px-1 shrink-0"
+                aria-label="Tutup"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                readOnly
+                value={savedUrl}
+                className="flex-1 min-w-0 rounded-xl border border-[#E5DED2] bg-[#FAF7F2] px-4 py-2.5 text-sm text-[#2A2622] font-mono"
+              />
+              <button
+                onClick={handleCopy}
+                className="shrink-0 px-5 py-2.5 rounded-xl font-bold text-sm border border-[#D6CBB9] text-[#2A2622] hover:bg-[#FAF7F2] transition"
+              >
+                {copied ? '✓ Tersalin' : '📋 Salin'}
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2">
+              <a
+                href={savedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-center py-2.5 rounded-xl font-bold text-sm border border-[#D6CBB9] text-[#2A2622] hover:bg-[#FAF7F2] transition"
+              >
+                👁️ Lihat Undangan
+              </a>
+              <button
+                onClick={handleShareWa}
+                className="flex-1 py-2.5 rounded-xl font-bold text-sm bg-[#25D366] text-white hover:bg-[#1da851] transition"
+              >
+                💬 Bagikan via WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error save */}
+      {saveError && (
+        <div className="sticky top-[65px] z-40 px-6">
+          <div className="max-w-7xl mx-auto mt-4 bg-[#C08552]/10 border border-[#C08552]/40 rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-xl shrink-0">⚠️</span>
+            <p className="flex-1 text-sm text-[#A66B3F]">{saveError}</p>
+            <button
+              onClick={() => setSaveError('')}
+              className="text-[#A66B3F] hover:opacity-70 text-xl leading-none px-1 shrink-0"
+              aria-label="Tutup"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Navigation Tabs */}
