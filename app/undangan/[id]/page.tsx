@@ -36,10 +36,15 @@ export default async function UndanganPage({ params }: { params: Promise<{ id: s
       ? event.gallery.map((f: string) => `${pbUrl}/api/files/${event.collectionId}/${event.id}/${f}`)
       : [];
 
+    const musicUrl = event.music_url
+      ? `${pbUrl}/api/files/${event.collectionId}/${event.id}/${event.music_url}`
+      : undefined;
+
     return (
       <InvitationView
-        event={{ ...(event as Record<string, unknown>), photo_bg: photoBg, gallery } as InvitationData}
+        event={{ ...(event as Record<string, unknown>), photo_bg: photoBg, gallery, music_url: musicUrl } as InvitationData}
         template={template}
+        eventId={event.id}
       />
     );
   } catch {

@@ -19,6 +19,7 @@ const sampleData: InvitationData = {
   bank_name: 'BCA',
   bank_account: '1234567890',
   bank_holder: 'Romeo Montague',
+  music_track: 'wedding-piano.mp3',
 };
 
 export function generateStaticParams() {
@@ -40,5 +41,5 @@ export default async function PreviewPage({ params }: { params: Promise<{ templa
   const tpl = getTemplate(template);
   if (!tpl) return notFound();
 
-  return <InvitationView event={sampleData} template={tpl} />;
+  return <InvitationView event={sampleData} template={tpl} eventId="preview-sample" />;
 }

@@ -34,6 +34,20 @@ export interface TemplateConfig {
     rsvp: boolean;
     map: boolean;
   };
+  // Musik latar bawaan (hanya jika features.music)
+  music?: {
+    defaultTrack?: string;   // nama file di /public/music/
+    label?: string;
+  };
+  // Story timeline (premium: 3 babak kisah cinta)
+  story?: {
+    enabled: boolean;
+    chapters: Array<{
+      id: string;
+      label: string;   // Pertemuan / Lamaran / Hari Bahagia
+      desc: string;
+    }>;
+  };
 }
 
 export const TEMPLATES: Record<string, TemplateConfig> = {
@@ -102,6 +116,7 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     layout: 'modern',
     animations: { enabled: true, type: 'fade', intensity: 'low' },
     features: { music: true, countdown: true, gallery: true, rsvp: true, map: true },
+    music: { defaultTrack: 'wedding-piano.mp3', label: 'Piano Dream' },
   },
   'rustic-garden': {
     id: 'rustic-garden',
@@ -123,6 +138,7 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     layout: 'elegant',
     animations: { enabled: true, type: 'parallax', intensity: 'medium' },
     features: { music: true, countdown: true, gallery: true, rsvp: true, map: true },
+    music: { defaultTrack: 'wedding-strings.mp3', label: 'Strings Romance' },
   },
 
   // ===== PREMIUM / FULL ANIMATED =====
@@ -146,6 +162,15 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     layout: 'elegant',
     animations: { enabled: true, type: 'particles', intensity: 'high' },
     features: { music: true, countdown: true, gallery: true, rsvp: true, map: true },
+    music: { defaultTrack: 'wedding-piano.mp3', label: 'Royal Piano' },
+    story: {
+      enabled: true,
+      chapters: [
+        { id: 'meet', label: 'Pertemuan', desc: 'Awal mula kisah kami berdua dimulai' },
+        { id: 'propose', label: 'Lamaran', desc: 'Janji suci untuk sehidup semati' },
+        { id: 'wedding', label: 'Hari Bahagia', desc: 'Hari di mana kami resmi jadi satu' },
+      ],
+    },
   },
   'cosmic-dream': {
     id: 'cosmic-dream',
@@ -167,6 +192,15 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     layout: 'modern',
     animations: { enabled: true, type: 'parallax', intensity: 'high' },
     features: { music: true, countdown: true, gallery: true, rsvp: true, map: true },
+    music: { defaultTrack: 'wedding-acoustic.mp3', label: 'Cosmic Acoustic' },
+    story: {
+      enabled: true,
+      chapters: [
+        { id: 'meet', label: 'Pertemuan', desc: 'Seperti bintang yang ditakdirkan bertabrakan' },
+        { id: 'propose', label: 'Lamaran', desc: 'Galaksi menyaksikan janji suci kami' },
+        { id: 'wedding', label: 'Hari Bahagia', desc: 'Semesta merayakan hari penyatuan kami' },
+      ],
+    },
   },
 };
 

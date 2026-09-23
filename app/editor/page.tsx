@@ -46,6 +46,27 @@ export default function EditorPage() {
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [compressing, setCompressing] = useState(false);
 
+  // Musik latar
+  const [musicFile, setMusicFile] = useState<File | null>(null);
+  const [musicTrack, setMusicTrack] = useState<string>('');
+
+  // Daftar lagu bawaan di /public/music/
+  const TRACK_OPTIONS = [
+    { file: 'wedding-piano.mp3', label: 'Piano Dream' },
+    { file: 'wedding-strings.mp3', label: 'Strings Romance' },
+    { file: 'wedding-acoustic.mp3', label: 'Acoustic Warm' },
+  ];
+
+  const handleMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] || null;
+    if (f && f.size > 10 * 1024 * 1024) {
+      setSaveError(`Lagu "${f.name}" berukuran ${(f.size / 1024 / 1024).toFixed(1)}MB. Maksimal 10MB.`);
+      return;
+    }
+    setMusicFile(f);
+    if (f) setMusicTrack('');
+  };
+
   const template = getTemplate(selectedTemplate);
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB — batas PocketBase
@@ -194,6 +215,10 @@ export default function EditorPage() {
 
       if (photoBg) data.photo_bg = photoBg;
       if (gallery.length > 0) data.gallery = gallery;
+      if (musicFile) data.music_url = musicFile;
+      else if (musicTrack) data.music_track = musicTrack;
+      // story_mood: ikut kemampuan template premium
+      data.story_mood = !!(template?.story?.enabled);
       
       const record = await pb.collection('events').create(data);
       setSavedUrl(`http://100.74.92.59:3000/undangan/${record.id}`);
@@ -610,9 +635,87 @@ export default function EditorPage() {
                     👁️ Lihat contoh jadi →
                   </a>
                 </div>
-                <TemplateSelector 
-                  selectedTemplate={selectedTemplate} 
-                  onSelect={setSelectedTemplate}
+
+                {/* Musik latar — hanya template pro/premium */}
+                {template?.features.music ? (
+                  <div className="mb-6 p-5 rounded-2xl border border-[#E5DED2] bg-[#FAF7F2] space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#6B6157]">
+                        🎵 Musik Latar
+                      </label>
+                      <p className="text-xs text-[#9C9286] mt-0.5">
+                        Template {template.name} mendukung musik. Pilih lagu bawaan atau upload MP3 sendiri (maks 10MB).
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <select
+                        value={musicTrack}
+                        onChange={(e) => {
+                          setMusicTrack(e.target.value);
+                          setMusicFile(null);
+                        }}
+                        className="w-full p-3 rounded-xl border border-[#E5DED2] bg-white text-sm text-[#2A2622] focus:outline-none focus:ring-2 focus:ring-[#7C8B6F]/30"
+                      >
+                        <option value="">— Pilih lagu bawaan —</option>
+                        {TRACK_OPTIONS.map((t) => (
+                          <option key={t.file} value={t.file}>
+                            {t.label}
+                          </option>
+                        ))}
+                        {template.music?.defaultTrack &&
+                          !TRACK_OPTIONS.some((t) => t.file === template.music!.defaultTrack) && (
+                            <option value={template.music.defaultTrack}>
+                              {template.music.label || template.music.defaultTrack}
+                            </option>
+                          )}
+                      </select>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept="audio/mpeg,audio/mp3"
+                          onChange={handleMusicUpload}
+                          className="block w-full text-xs text-[#6B6157] file:mr-3 file:py-2 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#7C8B6F] file:text-white hover:file:bg-[#5F6E54] cursor-pointer"
+                        />
+                        {musicFile && (
+                          <button
+                            type="button"
+                            onClick={() => { setMusicFile(null); }}
+                            aria-label="Hapus lagu upload"
+                            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 text-xs"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {(musicFile || musicTrack) && (
+                      <p className="text-xs text-[#7C8B6F] font-medium">
+                        ✓ {musicFile ? `Lagu upload: ${musicFile.name}` : `Lagu: ${TRACK_OPTIONS.find((t) => t.file === musicTrack)?.label || musicTrack}`}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mb-6 p-4 rounded-xl border border-dashed border-[#E5DED2] text-center">
+                    <p className="text-xs text-[#9C9286]">
+                      🔒 Template gratis belum mendukung musik latar &amp; animasi. Pilih template Pro/Premium untuk fitur lengkap.
+                    </p>
+                  </div>
+                )}
+
+                <TemplateSelector
+                  selectedTemplate={selectedTemplate}
+                  onSelect={(id) => {
+                    setSelectedTemplate(id);
+                    const tpl = getTemplate(id);
+                    // reset musik kalau template baru tidak mendukung
+                    if (!tpl?.features.music) {
+                      setMusicTrack('');
+                      setMusicFile(null);
+                    }
+                  }}
                   userPlan="premium"
                 />
               </div>

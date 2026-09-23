@@ -1,4 +1,8 @@
 import { TemplateConfig } from '@/lib/templates';
+import { Countdown } from './Countdown';
+import { MusicPlayer } from './MusicPlayer';
+import { RsvpForm } from './RsvpForm';
+import { StoryTimeline } from './StoryTimeline';
 
 export interface InvitationData {
   groom_name: string;
@@ -17,6 +21,9 @@ export interface InvitationData {
   bank_holder?: string;
   photo_bg?: string;
   gallery?: string[];
+  music_url?: string;
+  music_track?: string;
+  story_mood?: boolean;
 }
 
 function formatDate(iso?: string) {
@@ -34,7 +41,7 @@ function formatDate(iso?: string) {
  * - /undangan/[id]  → data dari PocketBase
  * - /preview/[tpl]  → data contoh, supaya user lihat hasil jadi tiap template
  */
-export function InvitationView({ event, template }: { event: InvitationData; template: TemplateConfig }) {
+export function InvitationView({ event, template, eventId }: { event: InvitationData; template: TemplateConfig; eventId?: string }) {
   const formattedDate = formatDate(event.event_date);
   const c = template.colors;
   const f = template.fonts;
@@ -74,6 +81,13 @@ export function InvitationView({ event, template }: { event: InvitationData; tem
 
           <p className="text-lg opacity-80">{formattedDate}</p>
           <p className="text-sm opacity-60">{event.location}</p>
+
+          {/* Countdown — hanya jika template mendukung */}
+          {template.features.countdown && event.event_date && (
+            <div className="pt-6">
+              <Countdown targetDate={event.event_date} accent={c.accent} />
+            </div>
+          )}
 
           <div className="pt-8">
             <a
@@ -139,6 +153,18 @@ export function InvitationView({ event, template }: { event: InvitationData; tem
             </div>
           </div>
         </section>
+      )}
+
+      {/* Story Timeline — premium only */}
+      {template.story?.enabled && template.story.chapters.length > 0 && (
+        <StoryTimeline
+          chapters={template.story.chapters}
+          accent={c.accent}
+          headingFont={f.heading}
+          brideName={event.bride_name}
+          groomName={event.groom_name}
+          weddingDate={formattedDate}
+        />
       )}
 
       {/* Event Details */}
@@ -207,46 +233,20 @@ export function InvitationView({ event, template }: { event: InvitationData; tem
 
       {/* RSVP / Wishes Form */}
       {template.features.rsvp && (
-        <section className="py-20 px-6" style={{ backgroundColor: c.secondary + '15' }}>
-          <div className="max-w-md mx-auto space-y-6">
-            <h3
-              className="text-2xl font-bold text-center tracking-widest uppercase"
-              style={{ color: c.accent }}
-            >
-              Ucapan & Doa
-            </h3>
-            <form className="space-y-4">
-              <input
-                type="text"
-                placeholder="Nama Kamu"
-                className="w-full p-3 rounded-xl border bg-transparent text-center"
-                style={{ borderColor: c.accent + '40' }}
-              />
-              <select
-                className="w-full p-3 rounded-xl border bg-transparent text-center"
-                style={{ borderColor: c.accent + '40' }}
-              >
-                <option>Konfirmasi Kehadiran</option>
-                <option>Hadir</option>
-                <option>Tidak Hadir</option>
-                <option>Belum Pasti</option>
-              </select>
-              <textarea
-                placeholder="Tulis ucapan dan doa untuk mempelai..."
-                rows={4}
-                className="w-full p-3 rounded-xl border bg-transparent text-center"
-                style={{ borderColor: c.accent + '40' }}
-              />
-              <button
-                type="submit"
-                className="w-full py-3 rounded-full font-bold transition hover:scale-105"
-                style={{ backgroundColor: c.accent, color: c.background }}
-              >
-                💌 Kirim Ucapan
-              </button>
-            </form>
-          </div>
-        </section>
+        <RsvpForm
+          eventId={eventId}
+          accent={c.accent}
+          headingFont={f.heading}
+        />
+      )}
+
+      {/* Music — floating toggle, hanya jika template mendukung */}
+      {template.features.music && (event.music_url || event.music_track) && (
+        <MusicPlayer
+          src={event.music_url || `/music/${event.music_track}`}
+          label={template.music?.label}
+          accent={c.accent}
+        />
       )}
 
       <footer className="py-12 px-6 text-center border-t" style={{ borderColor: c.accent + '20' }}>
