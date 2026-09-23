@@ -58,12 +58,29 @@ export default function EditorPage() {
 
     if (!file.type.startsWith('image/')) return file;
 
-    const img = await new Promise<HTMLImageElement | null>((resolve) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => resolve(null);
-      el.src = URL.createObjectURL(file);
-    });
+    // createImageBitmap({ imageOrientation: 'from-image' }) baca EXIF orientation
+    // → foto HP lanskap tidak miring. Fallback ke <img> biasa kalau tidak support.
+    type Bmp = ImageBitmap & { width: number; height: number };
+    let bmp: Bmp | null = null;
+    try {
+      bmp = (await createImageBitmap(file, {
+        imageOrientation: 'from-image',
+      } as ImageBitmapOptions)) as Bmp;
+    } catch {
+      bmp = null;
+    }
+
+    let img: Bmp | null = bmp;
+    let objUrl = '';
+    if (!img) {
+      img = await new Promise<Bmp | null>((resolve) => {
+        const el = new Image();
+        el.onload = () => resolve(el as unknown as Bmp);
+        el.onerror = () => resolve(null);
+        objUrl = URL.createObjectURL(file);
+        el.src = objUrl;
+      });
+    }
     if (!img) return file;
 
     let { width, height } = img;
@@ -83,7 +100,8 @@ export default function EditorPage() {
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, 'image/jpeg', QUALITY)
     );
-    URL.revokeObjectURL(img.src);
+    URL.revokeObjectURL(objUrl);
+    if (bmp && 'close' in bmp) bmp.close();
     if (!blob) return file;
 
     return new File([blob], file.name.replace(/\.(png|webp)$/i, '.jpg'), {
