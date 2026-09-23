@@ -61,6 +61,23 @@ export default function EditorPage() {
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB — batas PocketBase
 
+  const removePhotoBg = () => {
+    if (photoBgPreview) URL.revokeObjectURL(photoBgPreview);
+    setPhotoBg(null);
+    setPhotoBgPreview('');
+    // reset input supaya bisa pilih file yang sama lagi
+    const inp = document.querySelector<HTMLInputElement>('input[data-field="photo_bg"]');
+    if (inp) inp.value = '';
+  };
+
+  const removeGalleryPhoto = (i: number) => {
+    URL.revokeObjectURL(galleryPreviews[i]);
+    const nextFiles = gallery.filter((_, idx) => idx !== i);
+    const nextPreviews = galleryPreviews.filter((_, idx) => idx !== i);
+    setGallery(nextFiles);
+    setGalleryPreviews(nextPreviews);
+  };
+
   function checkPhoto(file: File, label: string): string | null {
     if (file.size > MAX_FILE_SIZE) {
       return `${label} "${file.name}" berukuran ${(file.size / 1024 / 1024).toFixed(1)}MB. Maksimal 5MB — silakan kecilkan dulu.`;
@@ -335,13 +352,22 @@ export default function EditorPage() {
                   <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP, maks 5MB. Ditampilkan sebagai latar belakang halaman utama undangan.</p>
                   <input
                     type="file"
+                    data-field="photo_bg"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={handlePhotoBg}
                     className="block w-full text-sm text-[#6B6157] file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#7C8B6F] file:text-white hover:file:bg-[#5F6E54] cursor-pointer"
                   />
                   {photoBgPreview && (
-                    <div className="relative rounded-xl overflow-hidden border border-[#E5DED2] max-h-64">
+                    <div className="relative rounded-xl overflow-hidden border border-[#E5DED2] max-h-64 group">
                       <img src={photoBgPreview} alt="Preview background" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={removePhotoBg}
+                        aria-label="Hapus foto background"
+                        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition text-sm"
+                      >
+                        ✕
+                      </button>
                     </div>
                   )}
                 </div>
@@ -364,6 +390,14 @@ export default function EditorPage() {
                       {galleryPreviews.map((src, i) => (
                         <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-[#E5DED2]">
                           <img src={src} alt={`Galeri ${i + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryPhoto(i)}
+                            aria-label={`Hapus foto galeri ${i + 1}`}
+                            className="absolute top-1.5 right-1.5 w-7 h-7 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition text-xs"
+                          >
+                            ✕
+                          </button>
                         </div>
                       ))}
                     </div>
