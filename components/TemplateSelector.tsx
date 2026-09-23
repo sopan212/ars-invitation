@@ -9,7 +9,7 @@ export function TemplateSelector({
   userPlan = 'free' 
 }: { 
   selectedTemplate: string; 
-  onSelect: (id: string) => void; 
+  onSelect: (id: string) => void;
   userPlan?: 'free' | 'pro' | 'premium';
 }) {
   const [activeCategory, setActiveCategory] = useState<'free' | 'pro' | 'premium'>('free');
@@ -18,15 +18,21 @@ export function TemplateSelector({
   const userPlanLevel = planOrder[userPlan];
 
   const categories = [
-    { id: 'free', label: 'Gratis', icon: '🆓', color: 'text-green-400' },
-    { id: 'pro', label: 'Pro', icon: '⭐', color: 'text-yellow-400' },
-    { id: 'premium', label: 'Premium', icon: '💎', color: 'text-purple-400' },
+    { id: 'free', label: 'Gratis', icon: '🆓' },
+    { id: 'pro', label: 'Pro', icon: '⭐' },
+    { id: 'premium', label: 'Premium', icon: '💎' },
   ] as const;
+
+  const badgeColor: Record<string, string> = {
+    free: 'bg-[#7C8B6F]/10 text-[#7C8B6F]',
+    pro: 'bg-[#C08552]/15 text-[#A66B3F]',
+    premium: 'bg-[#2A2622]/10 text-[#2A2622]',
+  };
 
   return (
     <div className="space-y-6">
       {/* Category Tabs */}
-      <div className="flex gap-2 border-b border-white/10 pb-4">
+      <div className="flex gap-2 border-b border-[#E5DED2] pb-4">
         {categories.map((cat) => {
           const isLocked = planOrder[cat.id] > userPlanLevel;
           return (
@@ -34,15 +40,15 @@ export function TemplateSelector({
               key={cat.id}
               onClick={() => !isLocked && setActiveCategory(cat.id)}
               disabled={isLocked}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all 
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border 
                 ${activeCategory === cat.id 
-                  ? 'bg-white/10 border border-white/20' 
-                  : 'text-gray-500 hover:text-white/70'} 
+                  ? 'bg-[#7C8B6F] border-[#7C8B6F] text-white' 
+                  : 'text-[#6B6157] border-[#E5DED2] hover:text-[#2A2622] hover:border-[#D6CBB9]'} 
                 ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <span>{cat.icon}</span>
               <span>{cat.label}</span>
-              {isLocked && <span className="text-xs text-gray-400">(Upgrade)</span>}
+              {isLocked && <span className="text-xs opacity-70">(Upgrade)</span>}
             </button>
           );
         })}
@@ -54,41 +60,44 @@ export function TemplateSelector({
           <button
             key={template.id}
             onClick={() => onSelect(template.id)}
-            className={`relative group p-4 rounded-2xl border transition-all duration-300 
+            className={`relative group p-4 rounded-2xl border transition-all duration-300 text-left
               ${selectedTemplate === template.id 
-                ? 'border-yellow-400 bg-yellow-400/10 ring-2 ring-yellow-400/20' 
-                : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'}`}
+                ? 'border-[#7C8B6F] bg-[#7C8B6F]/5 ring-2 ring-[#7C8B6F]/20' 
+                : 'border-[#E5DED2] bg-[#FAF7F2] hover:border-[#D6CBB9] hover:bg-[#FFFDF9]'}`}
           >
             {/* Category Badge */}
             <div className="absolute top-3 right-3">
-              <span className={`px-2 py-1 text-xs font-bold rounded-full 
-                ${template.category === 'free' ? 'bg-green-500/20 text-green-400' : 
-                 template.category === 'pro' ? 'bg-yellow-500/20 text-yellow-400' : 
-                 'bg-purple-500/20 text-purple-400'}`}>
-                {template.category.toUpperCase()}
+              <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wide ${badgeColor[template.category]}`}>
+                {template.category}
               </span>
             </div>
 
-            {/* Thumbnail */}
-            <div className="aspect-square rounded-xl bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center mb-4 text-5xl group-hover:scale-105 transition-transform">
+            {/* Thumbnail — preview warna template asli */}
+            <div 
+              className="aspect-square rounded-xl flex items-center justify-center mb-4 text-5xl group-hover:scale-105 transition-transform"
+              style={{ 
+                backgroundColor: template.colors.background,
+                color: template.colors.accent,
+              }}
+            >
               {template.thumbnail}
             </div>
 
             {/* Info */}
-            <h4 className="font-bold text-white mb-1 group-hover:text-yellow-400 transition">{template.name}</h4>
-            <p className="text-xs text-gray-400 mb-3 line-clamp-2">{template.description}</p>
+            <h4 className="font-bold text-[#2A2622] mb-1 group-hover:text-[#7C8B6F] transition">{template.name}</h4>
+            <p className="text-xs text-[#6B6157] mb-3 line-clamp-2">{template.description}</p>
 
             {/* Features */}
             <div className="flex flex-wrap gap-1 mb-4">
-              {template.features.music && <span className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-400 rounded">🎵 Musik</span>}
-              {template.features.countdown && <span className="px-2 py-0.5 text-xs bg-blue-500/20 text-blue-400 rounded">⏱ Countdown</span>}
-              {template.features.gallery && <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded">🖼 Gallery</span>}
-              {template.features.map && <span className="px-2 py-0.5 text-xs bg-orange-500/20 text-orange-400 rounded">🗺 Map</span>}
+              {template.features.music && <span className="px-2 py-0.5 text-xs bg-[#7C8B6F]/10 text-[#7C8B6F] rounded">🎵 Musik</span>}
+              {template.features.countdown && <span className="px-2 py-0.5 text-xs bg-[#7C8B6F]/10 text-[#7C8B6F] rounded">⏱ Countdown</span>}
+              {template.features.gallery && <span className="px-2 py-0.5 text-xs bg-[#7C8B6F]/10 text-[#7C8B6F] rounded">🖼 Gallery</span>}
+              {template.features.map && <span className="px-2 py-0.5 text-xs bg-[#7C8B6F]/10 text-[#7C8B6F] rounded">🗺 Map</span>}
             </div>
 
             {/* Selection Indicator */}
             {selectedTemplate === template.id && (
-              <div className="absolute inset-0 border-2 border-yellow-400 rounded-2xl pointer-events-none animate-pulse" />
+              <div className="absolute inset-0 border-2 border-[#7C8B6F] rounded-2xl pointer-events-none" />
             )}
           </button>
         ))}
@@ -96,10 +105,10 @@ export function TemplateSelector({
 
       {/* Upgrade Notice */}
       {activeCategory !== 'free' && userPlanLevel < planOrder[activeCategory] && (
-        <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-center">
-          <p className="text-yellow-300 text-sm">
+        <div className="p-4 rounded-xl bg-[#C08552]/10 border border-[#C08552]/30 text-center">
+          <p className="text-[#A66B3F] text-sm">
             Template ini butuh paket <span className="font-bold">{activeCategory.toUpperCase()}</span>. 
-            <a href="#pricing" className="text-yellow-400 underline hover:text-yellow-300">Upgrade di sini</a>
+            <a href="#pricing" className="underline hover:opacity-70">Upgrade di sini</a>
           </p>
         </div>
       )}
