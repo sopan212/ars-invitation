@@ -99,6 +99,17 @@ export function TemplateSelector({
             {selectedTemplate === template.id && (
               <div className="absolute inset-0 border-2 border-[#7C8B6F] rounded-2xl pointer-events-none" />
             )}
+
+            {/* Preview link — hasil jadi template ini */}
+            <a
+              href={`/preview/${template.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-3 right-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#7C8B6F] hover:text-[#5F6E54] bg-[#FFFDF9]/90 backdrop-blur px-2.5 py-1 rounded-full border border-[#E5DED2] transition z-10"
+            >
+              👁️ Contoh jadi
+            </a>
           </button>
         ))}
       </div>

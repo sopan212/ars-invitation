@@ -124,9 +124,9 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { name: 'Classic Elegant', desc: 'Serif timeless untuk acara formal', tone: 'bg-[#FFFDF9] border-[#E5DED2]', text: 'text-[#1a1a2e]', tag: 'Free' },
-              { name: 'Rustic Garden', desc: 'Earth-tone, hangat, dekat dengan alam', tone: 'bg-[#F3EFE5] border-[#D6CBB9]', text: 'text-[#1b4332]', tag: 'Pro' },
-              { name: 'Modern Purple', desc: 'Gelap, elegan, sedikit futuristik', tone: 'bg-[#131231] border-[#2a2852]', text: 'text-[#f1f5f9]', tag: 'Pro' },
+              { name: 'Classic Elegant', id: 'classic-elegant', desc: 'Serif timeless untuk acara formal', tone: 'bg-[#FFFDF9] border-[#E5DED2]', text: 'text-[#1a1a2e]', tag: 'Free' },
+              { name: 'Rustic Garden', id: 'rustic-garden', desc: 'Earth-tone, hangat, dekat dengan alam', tone: 'bg-[#F3EFE5] border-[#D6CBB9]', text: 'text-[#1b4332]', tag: 'Pro' },
+              { name: 'Modern Purple', id: 'modern-purple', desc: 'Gelap, elegan, sedikit futuristik', tone: 'bg-[#131231] border-[#2a2852]', text: 'text-[#f1f5f9]', tag: 'Pro' },
             ].map((t, i) => (
               <div key={i} className={`group rounded-2xl border ${t.tone} overflow-hidden transition-all duration-300 hover:-translate-y-1`}>
                 <div className="h-56 flex items-center justify-center">
@@ -140,9 +140,19 @@ export default function Home() {
                     <span className="text-sm text-[#6B6157]">{t.desc}</span>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#7C8B6F]/10 text-[#7C8B6F] shrink-0">{t.tag}</span>
                   </div>
-                  <Link href="/editor" className="mt-5 block w-full text-center bg-[#C08552] text-white py-3 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95">
-                    Pakai Template
-                  </Link>
+                  <div className="mt-5 flex gap-2">
+                    <Link href="/editor" className="flex-1 text-center bg-[#C08552] text-white py-3 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95">
+                      Pakai Template
+                    </Link>
+                    <a
+                      href={`/preview/${t.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center border border-[#D6CBB9] text-[#6B6157] hover:text-[#2A2622] px-4 py-3 rounded-full font-semibold text-sm transition whitespace-nowrap"
+                    >
+                      👁️ Contoh
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}

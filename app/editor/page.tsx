@@ -355,7 +355,17 @@ export default function EditorPage() {
 
             {activeTab === 'template' && (
               <div className="bg-[#FFFDF9] border border-[#E5DED2] p-6 rounded-2xl">
-                <h3 className="font-serif text-xl font-bold mb-6">Pilih Desain & Tema Undangan</h3>
+                <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                  <h3 className="font-serif text-xl font-bold">Pilih Desain & Tema Undangan</h3>
+                  <a
+                    href={`/preview/${selectedTemplate}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7C8B6F] hover:text-[#5F6E54] transition border border-[#E5DED2] hover:border-[#D6CBB9] px-4 py-2 rounded-full"
+                  >
+                    👁️ Lihat contoh jadi →
+                  </a>
+                </div>
                 <TemplateSelector 
                   selectedTemplate={selectedTemplate} 
                   onSelect={setSelectedTemplate}
