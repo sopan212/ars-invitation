@@ -59,9 +59,33 @@ export default function EditorPage() {
     setGalleryPreviews(files.map((f) => URL.createObjectURL(f)));
   };
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB — batas PocketBase
+
+  function checkPhoto(file: File, label: string): string | null {
+    if (file.size > MAX_FILE_SIZE) {
+      return `${label} "${file.name}" berukuran ${(file.size / 1024 / 1024).toFixed(1)}MB. Maksimal 5MB — silakan kecilkan dulu.`;
+    }
+    const okTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!okTypes.includes(file.type)) {
+      return `${label} "${file.name}" format ${file.type || 'tidak dikenal'} tidak didukung. Pakai JPG, PNG, atau WEBP.`;
+    }
+    return null;
+  }
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveError('');
+
+    // Validasi foto sebelum upload — beri pesan jelas, jangan biarkan 400 dari server
+    if (photoBg) {
+      const err = checkPhoto(photoBg, 'Foto background');
+      if (err) { setSaveError(err); setIsSaving(false); return; }
+    }
+    if (gallery.length > 0) {
+      const errs = gallery.map((f) => checkPhoto(f, 'Galeri')).filter((e): e is string => !!e);
+      if (errs.length > 0) { setSaveError(errs[0]); setIsSaving(false); return; }
+    }
+
     try {
       const data: Record<string, any> = { 
         title, 
@@ -89,7 +113,16 @@ export default function EditorPage() {
       setSavedUrl(`http://100.74.92.59:3000/undangan/${record.id}`);
       setCopied(false);
     } catch (error: any) {
-      setSaveError(error?.message || 'Gagal menyimpan. Coba lagi.');
+      // Ambil pesan validation PocketBase (400) kalau ada
+      const valErr = error?.response?.data;
+      let msg = error?.message || 'Gagal menyimpan. Coba lagi.';
+      if (valErr) {
+        const parts = Object.entries(valErr).map(
+          ([k, v]: any) => `${k}: ${v?.message || JSON.stringify(v)}`
+        );
+        msg = parts.join(' | ') || msg;
+      }
+      setSaveError(msg);
     } finally {
       setIsSaving(false);
     }
