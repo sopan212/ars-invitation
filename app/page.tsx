@@ -14,8 +14,8 @@ const features = [
 
 const plans = [
   { plan: 'Gratis', price: 'Rp 0', features: ['2 Template', '100 Tamu', 'RSVP Dasar', 'Link Sharing'], cta: 'Mulai Gratis', highlight: false },
-  { plan: 'Pro', price: 'Rp 49K', features: ['Semua Template Pro', 'Tamu Unlimited', 'Galeri Foto', 'Musik Latar', 'Countdown'], cta: 'Pilih Pro', highlight: true },
-  { plan: 'Premium', price: 'Rp 99K', features: ['Semua di Pro', 'Full Animasi', 'Custom Domain', 'Prioritas Support', 'Analytics'], cta: 'Pilih Premium', highlight: false },
+  { plan: 'Pro', price: 'Rp 49K', features: ['Semua Template Pro', 'Tamu Unlimited', 'Galeri Foto', 'Musik Latar', 'Countdown'], cta: 'Mulai Gratis', highlight: true },
+  { plan: 'Premium', price: 'Rp 99K', features: ['Semua di Pro', 'Full Animasi', 'Custom Domain', 'Prioritas Support', 'Analytics'], cta: 'Mulai Gratis', highlight: false },
 ];
 
 const faqs = [
@@ -33,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#2A2622] font-sans">
+    <div className="min-h-[100dvh] bg-[#FAF7F2] text-[#2A2622] font-sans">
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-[#FAF7F2]/85 border-b border-[#E5DED2]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -48,45 +48,63 @@ export default function Home() {
             <a href="#faq" className="hover:text-[#2A2622] transition">FAQ</a>
           </div>
           <Link href="/editor" className="bg-[#7C8B6F] text-white px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-[#5F6E54] transition hover:scale-105 active:scale-95">
-            Buat Undangan
+            Mulai Gratis
           </Link>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16">
+      <section className="relative min-h-[100dvh] flex items-center px-6 pt-32 pb-16">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#D6CBB9] to-transparent" />
         <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-[#D6CBB9] to-transparent" />
 
-        <div className={`relative max-w-3xl mx-auto text-center transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="inline-block mb-8 px-4 py-1.5 rounded-full border border-[#D6CBB9] bg-[#FFFDF9] text-sm text-[#6B6157]">
-            ✨ Undangan digital untuk pasangan modern
+        <div className="relative max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Kiri: copy */}
+          <div className={`transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="inline-block mb-8 px-4 py-1.5 rounded-full border border-[#D6CBB9] bg-[#FFFDF9] text-sm text-[#6B6157]">
+              ✨ Undangan digital untuk pasangan modern
+            </div>
+
+            <h2 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-8">
+              Undangan yang
+              <br />
+              <span className="italic text-[#7C8B6F]">terasa hangat</span>
+              <span className="text-[#C08552]">,</span>
+              <br />
+              bukan otomatis.
+            </h2>
+
+            <p className="text-lg md:text-xl text-[#6B6157] max-w-xl mb-10 leading-relaxed">
+              Pilih template, isi data, bagikan link. Selesai dalam 5 menit, tapi tamu kamu akan ingat berhari-hari.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4">
+              <Link href="/editor" className="w-full sm:w-auto bg-[#C08552] text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95 shadow-lg shadow-[#C08552]/20">
+                Mulai Gratis
+              </Link>
+              <a href="#templates" className="w-full sm:w-auto border border-[#D6CBB9] text-[#2A2622] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#FFFDF9] transition">
+                Lihat Template
+              </a>
+            </div>
           </div>
 
-          <h2 className="font-serif text-5xl md:text-7xl leading-[1.05] tracking-tight mb-8">
-            Undangan yang
-            <br />
-            <span className="italic text-[#7C8B6F]">terasa hangat</span>
-            <span className="text-[#C08552]">,</span>
-            <br />
-            bukan otomatis.
-          </h2>
-
-          <p className="text-lg md:text-xl text-[#6B6157] max-w-xl mx-auto mb-10 leading-relaxed">
-            Pilih template, isi data, bagikan link. Selesai dalam 5 menit —
-            tapi tamu kamu akan ingat berhari-hari.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/editor" className="w-full sm:w-auto bg-[#C08552] text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95 shadow-lg shadow-[#C08552]/20">
-              Mulai Gratis
-            </Link>
-            <a href="#templates" className="w-full sm:w-auto border border-[#D6CBB9] text-[#2A2622] px-8 py-4 rounded-full font-bold text-lg hover:bg-[#FFFDF9] transition">
-              Lihat Template
-            </a>
+          {/* Kanan: foto prewedding asli */}
+          <div className={`relative transition-all duration-1000 delay-150 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-[#E5DED2] shadow-2xl shadow-[#2A2622]/10">
+              <img
+                src="/images/hero-prewedding.jpg"
+                alt="Foto prewedding pasangan di ladang saat matahari terbenam"
+                className="w-full h-full object-cover"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2A2622]/30 via-transparent to-transparent" />
+            </div>
+            {/* cart dayang: tanggal di luar frame */}
+            <div className="absolute -bottom-6 -left-6 bg-[#FFFDF9] border border-[#E5DED2] rounded-2xl px-6 py-4 shadow-lg hidden sm:block">
+              <p className="text-xs tracking-[0.2em] uppercase text-[#756C61]">Save The Date</p>
+              <p className="font-serif text-2xl font-semibold text-[#2A2622] mt-1">31 Desember 2026</p>
+            </div>
           </div>
-
-          <p className="mt-6 text-sm text-[#9C9286]">Tanpa kartu kredit • Selesai dalam 5 menit</p>
         </div>
       </section>
 
@@ -142,7 +160,7 @@ export default function Home() {
                   </div>
                   <div className="mt-5 flex gap-2">
                     <Link href="/editor" className="flex-1 text-center bg-[#C08552] text-white py-3 rounded-full font-bold text-sm hover:bg-[#A66B3F] transition hover:scale-105 active:scale-95">
-                      Pakai Template
+                      Mulai Gratis
                     </Link>
                     <a
                       href={`/preview/${t.id}`}
@@ -164,7 +182,6 @@ export default function Home() {
       <section id="pricing" className="py-24 px-6 bg-[#FFFDF9] border-y border-[#E5DED2]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.25em] uppercase text-[#7C8B6F] mb-3">Harga</p>
             <h3 className="font-serif text-4xl md:text-5xl mb-4">
               Transparan, <span className="italic text-[#7C8B6F]">tanpa biaya tersembunyi</span>
             </h3>
@@ -212,7 +229,6 @@ export default function Home() {
       <section id="faq" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs tracking-[0.25em] uppercase text-[#7C8B6F] mb-3">FAQ</p>
             <h3 className="font-serif text-4xl md:text-5xl">
               Pertanyaan <span className="italic text-[#7C8B6F]">yang sering muncul</span>
             </h3>
@@ -241,7 +257,7 @@ export default function Home() {
             Ribuan pasangan sudah membuat undangan yang benar-benar mereka sukai. Giliran kamu.
           </p>
           <Link href="/editor" className="inline-block bg-[#FAF7F2] text-[#2A2622] px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition hover:scale-105 active:scale-95">
-            Buat Undangan Sekarang
+            Mulai Gratis
           </Link>
         </div>
       </section>
@@ -253,7 +269,7 @@ export default function Home() {
             <Link href="/" className="font-serif text-lg font-semibold transition hover:opacity-80">
               <span className="text-[#7C8B6F]">ARS</span>.invitation
             </Link>
-            <p className="text-[#9C9286] text-sm mt-1">© 2026 ARS.invitation. All rights reserved.</p>
+            <p className="text-[#756C61] text-sm mt-1">© 2026 ARS.invitation. All rights reserved.</p>
           </div>
           <div className="flex items-center gap-6 text-sm text-[#6B6157]">
             <a href="#" className="hover:text-[#7C8B6F] transition">Privacy</a>

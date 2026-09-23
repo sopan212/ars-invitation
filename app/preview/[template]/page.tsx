@@ -29,9 +29,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ template: string }> }): Promise<Metadata> {
   const { template } = await params;
   const tpl = getTemplate(template);
-  if (!tpl) return { title: 'Preview Template — ARS.invitation' };
+  if (!tpl) return { title: 'Preview Template, ARS.invitation' };
   return {
-    title: `Preview ${tpl.name} — ARS.invitation`,
+    title: `Preview ${tpl.name}, ARS.invitation`,
     description: `Lihat hasil jadi template ${tpl.name} dengan data contoh.`,
   };
 }

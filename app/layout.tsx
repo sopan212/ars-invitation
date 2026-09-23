@@ -14,7 +14,7 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ARS.invitation — Undangan Digital Pernikahan",
+  title: "ARS.invitation, Undangan Digital Pernikahan",
   description: "Buat undangan pernikahan digital yang elegan dengan ARS.invitation",
 };
 

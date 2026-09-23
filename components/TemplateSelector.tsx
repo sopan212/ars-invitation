@@ -72,7 +72,7 @@ export function TemplateSelector({
               </span>
             </div>
 
-            {/* Thumbnail — preview warna template asli */}
+            {/* Thumbnail, preview warna template asli */}
             <div 
               className="aspect-square rounded-xl flex items-center justify-center mb-4 text-5xl group-hover:scale-105 transition-transform"
               style={{ 
@@ -100,7 +100,7 @@ export function TemplateSelector({
               <div className="absolute inset-0 border-2 border-[#7C8B6F] rounded-2xl pointer-events-none" />
             )}
 
-            {/* Preview link — hasil jadi template ini */}
+            {/* Preview link, hasil jadi template ini */}
             <a
               href={`/preview/${template.id}`}
               target="_blank"

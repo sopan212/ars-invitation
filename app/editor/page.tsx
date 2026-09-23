@@ -12,7 +12,7 @@ pb.autoCancellation(false);
 export default function EditorPage() {
   const [activeTab, setActiveTab] = useState<'couple' | 'event' | 'gift' | 'template'>('couple');
 
-  // Hasil save — link undangan user
+  // Hasil save, link undangan user
   const [savedUrl, setSavedUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -39,7 +39,7 @@ export default function EditorPage() {
 
   const [selectedTemplate, setSelectedTemplate] = useState('classic-elegant');
 
-  // Photo state — ponytail: preview via object URL, replaced by PB url after save
+  // Photo state, ponytail: preview via object URL, replaced by PB url after save
   const [photoBg, setPhotoBg] = useState<File | null>(null);
   const [gallery, setGallery] = useState<File[]>([]);
   const [photoBgPreview, setPhotoBgPreview] = useState<string>('');
@@ -69,7 +69,7 @@ export default function EditorPage() {
 
   const template = getTemplate(selectedTemplate);
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB — batas PocketBase
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB, batas PocketBase
 
   // Compress foto di browser: resize ke max 1920px, re-encode JPEG 80%
   // Ponytail: kalau perlu kualitas lebih tinggi nanti, naikkan ke 0.9 / 2560px
@@ -170,7 +170,7 @@ export default function EditorPage() {
 
   function checkPhoto(file: File, label: string): string | null {
     if (file.size > MAX_FILE_SIZE) {
-      return `${label} "${file.name}" berukuran ${(file.size / 1024 / 1024).toFixed(1)}MB. Maksimal 5MB — silakan kecilkan dulu.`;
+      return `${label} "${file.name}" berukuran ${(file.size / 1024 / 1024).toFixed(1)}MB. Maksimal 5MB, silakan kecilkan dulu.`;
     }
     const okTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!okTypes.includes(file.type)) {
@@ -183,7 +183,7 @@ export default function EditorPage() {
     setIsSaving(true);
     setSaveError('');
 
-    // Validasi foto sebelum upload — beri pesan jelas, jangan biarkan 400 dari server
+    // Validasi foto sebelum upload, beri pesan jelas, jangan biarkan 400 dari server
     if (photoBg) {
       const err = checkPhoto(photoBg, 'Foto background');
       if (err) { setSaveError(err); setIsSaving(false); return; }
@@ -280,7 +280,7 @@ export default function EditorPage() {
         </div>
       </div>
 
-      {/* Panel hasil save — link undangan user */}
+      {/* Panel hasil save, link undangan user */}
       {savedUrl && (
         <div className="sticky top-[65px] z-40 px-6">
           <div className="max-w-7xl mx-auto mt-4 bg-[#FFFDF9] border border-[#7C8B6F]/40 rounded-2xl p-5 shadow-lg shadow-[#7C8B6F]/10 space-y-4">
@@ -288,11 +288,11 @@ export default function EditorPage() {
               <span className="text-2xl shrink-0">🎉</span>
               <div className="flex-1 min-w-0">
                 <h3 className="font-serif text-lg font-bold text-[#2A2622]">Undangan berhasil diterbitkan!</h3>
-                <p className="text-sm text-[#6B6157]">Simpan link ini — bagikan ke tamu undangan kamu.</p>
+                <p className="text-sm text-[#6B6157]">Simpan link ini, bagikan ke tamu undangan kamu.</p>
               </div>
               <button
                 onClick={() => setSavedUrl('')}
-                className="text-[#9C9286] hover:text-[#2A2622] text-xl leading-none px-1 shrink-0"
+                className="text-[#756C61] hover:text-[#2A2622] text-xl leading-none px-1 shrink-0"
                 aria-label="Tutup"
               >
                 ×
@@ -443,7 +443,7 @@ export default function EditorPage() {
                   <label className="block text-sm font-medium text-[#6B6157]">
                     🌅 Foto Background (Hero / Cover)
                   </label>
-                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP. Foto otomatis dikompres (maks 1920px, ≤5MB) — aman untuk foto HP berukuran besar.</p>
+                  <p className="text-xs text-[#756C61]">JPG / PNG / WEBP. Foto otomatis dikompres (maks 1920px, ≤5MB), aman untuk foto HP berukuran besar.</p>
                   {compressing && (
                     <p className="text-xs text-[#7C8B6F] font-medium animate-pulse">⏳ Mengompres foto...</p>
                   )}
@@ -474,7 +474,7 @@ export default function EditorPage() {
                   <label className="block text-sm font-medium text-[#6B6157]">
                     📚 Galeri Foto (maks 10 foto)
                   </label>
-                  <p className="text-xs text-[#9C9286]">JPG / PNG / WEBP. Setiap foto otomatis dikompres (maks 1920px, ≤5MB).</p>
+                  <p className="text-xs text-[#756C61]">JPG / PNG / WEBP. Setiap foto otomatis dikompres (maks 1920px, ≤5MB).</p>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -636,14 +636,14 @@ export default function EditorPage() {
                   </a>
                 </div>
 
-                {/* Musik latar — hanya template pro/premium */}
+                {/* Musik latar, hanya template pro/premium */}
                 {template?.features.music ? (
                   <div className="mb-6 p-5 rounded-2xl border border-[#E5DED2] bg-[#FAF7F2] space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-[#6B6157]">
                         🎵 Musik Latar
                       </label>
-                      <p className="text-xs text-[#9C9286] mt-0.5">
+                      <p className="text-xs text-[#756C61] mt-0.5">
                         Template {template.name} mendukung musik. Pilih lagu bawaan atau upload MP3 sendiri (maks 10MB).
                       </p>
                     </div>
@@ -657,7 +657,7 @@ export default function EditorPage() {
                         }}
                         className="w-full p-3 rounded-xl border border-[#E5DED2] bg-white text-sm text-[#2A2622] focus:outline-none focus:ring-2 focus:ring-[#7C8B6F]/30"
                       >
-                        <option value="">— Pilih lagu bawaan —</option>
+                        <option value="">- Pilih lagu bawaan -</option>
                         {TRACK_OPTIONS.map((t) => (
                           <option key={t.file} value={t.file}>
                             {t.label}
@@ -699,7 +699,7 @@ export default function EditorPage() {
                   </div>
                 ) : (
                   <div className="mb-6 p-4 rounded-xl border border-dashed border-[#E5DED2] text-center">
-                    <p className="text-xs text-[#9C9286]">
+                    <p className="text-xs text-[#756C61]">
                       🔒 Template gratis belum mendukung musik latar &amp; animasi. Pilih template Pro/Premium untuk fitur lengkap.
                     </p>
                   </div>

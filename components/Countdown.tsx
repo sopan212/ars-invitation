@@ -18,9 +18,9 @@ function calcRemaining(ms: number) {
 }
 
 export function Countdown({ targetDate, accent, label = 'Menuju Hari Bahagia' }: Props) {
-  const [remaining, setRemaining] = useState<number>(() =>
-    new Date(targetDate).getTime() - Date.now()
-  );
+  // Hydration-safe: mulai kosong, isi di client saja.
+  // Date.now() di SSR beda dengan di client -> hydration mismatch.
+  const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     const tick = () =>
@@ -29,6 +29,24 @@ export function Countdown({ targetDate, accent, label = 'Menuju Hari Bahagia' }:
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [targetDate]);
+
+  if (remaining === null) {
+    // skeleton sebelum mount, bentrok dengan layout final
+    return (
+      <div className="text-center space-y-4">
+        <p className="text-sm tracking-[0.25em] uppercase opacity-60">{label}</p>
+        <div className="flex justify-center gap-3 sm:gap-4">
+          {['', '', '', ''].map((_, i) => (
+            <div
+              key={i}
+              className="min-w-[64px] sm:min-w-[80px] h-[78px] rounded-2xl border animate-pulse"
+              style={{ borderColor: accent + '20', backgroundColor: accent + '06' }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const { days, hours, minutes, seconds } = calcRemaining(remaining);
   const done = remaining <= 0;

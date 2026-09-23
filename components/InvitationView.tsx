@@ -82,7 +82,7 @@ export function InvitationView({ event, template, eventId }: { event: Invitation
           <p className="text-lg opacity-80">{formattedDate}</p>
           <p className="text-sm opacity-60">{event.location}</p>
 
-          {/* Countdown — hanya jika template mendukung */}
+          {/* Countdown, hanya jika template mendukung */}
           {template.features.countdown && event.event_date && (
             <div className="pt-6">
               <Countdown targetDate={event.event_date} accent={c.accent} />
@@ -155,7 +155,7 @@ export function InvitationView({ event, template, eventId }: { event: Invitation
         </section>
       )}
 
-      {/* Story Timeline — premium only */}
+      {/* Story Timeline, premium only */}
       {template.story?.enabled && template.story.chapters.length > 0 && (
         <StoryTimeline
           chapters={template.story.chapters}
@@ -240,7 +240,7 @@ export function InvitationView({ event, template, eventId }: { event: Invitation
         />
       )}
 
-      {/* Music — floating toggle, hanya jika template mendukung */}
+      {/* Music, floating toggle, hanya jika template mendukung */}
       {template.features.music && (event.music_url || event.music_track) && (
         <MusicPlayer
           src={event.music_url || `/music/${event.music_track}`}

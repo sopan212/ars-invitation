@@ -109,15 +109,21 @@ export function RsvpForm({ eventId, accent, headingFont }: Props) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Nama Kamu"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full p-3 rounded-xl border bg-transparent text-center focus:outline-none focus:ring-2 transition"
-            style={{ borderColor: accent + '40', color: 'inherit' }}
-          />
+          <div className="space-y-2">
+            <label htmlFor="rsvp-name" className="block text-sm font-medium opacity-70">
+              Nama
+            </label>
+            <input
+              id="rsvp-name"
+              type="text"
+              placeholder="Nama kamu"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full p-3 rounded-xl border bg-transparent text-center focus:outline-none focus:ring-2 transition"
+              style={{ borderColor: accent + '40', color: 'inherit' }}
+            />
+          </div>
           <div className="flex gap-2">
             {Object.entries(PRESENCE_LABEL).map(([val, label]) => (
               <button
@@ -135,14 +141,20 @@ export function RsvpForm({ eventId, accent, headingFont }: Props) {
               </button>
             ))}
           </div>
-          <textarea
-            placeholder="Tulis ucapan dan doa untuk mempelai..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={4}
-            className="w-full p-3 rounded-xl border bg-transparent focus:outline-none focus:ring-2 transition resize-none"
-            style={{ borderColor: accent + '40', color: 'inherit' }}
-          />
+          <div className="space-y-2">
+            <label htmlFor="rsvp-message" className="block text-sm font-medium opacity-70">
+              Ucapan &amp; Doa
+            </label>
+            <textarea
+              id="rsvp-message"
+              placeholder="Tulis ucapan dan doa untuk mempelai..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={4}
+              className="w-full p-3 rounded-xl border bg-transparent focus:outline-none focus:ring-2 transition resize-none"
+              style={{ borderColor: accent + '40', color: 'inherit' }}
+            />
+          </div>
           <button
             type="submit"
             disabled={sending}

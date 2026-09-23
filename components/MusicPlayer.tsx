@@ -9,7 +9,7 @@ interface Props {
 }
 
 /**
- * Floating music toggle. Autoplay diblokir browser sampai user interaksi —
+ * Floating music toggle. Autoplay diblokir browser sampai user interaksi -
  * tombol ini cara satu-satunya untuk mulai. Lalu muter loop.
  */
 export function MusicPlayer({ src, label, accent }: Props) {
